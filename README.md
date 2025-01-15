@@ -25,6 +25,7 @@
    docker images
 ```
 
+<!-- ------------------------------  -->
 ## Write Dockerfile
 
 When I want to test the communication between containers, I often
@@ -33,6 +34,7 @@ like ```curl```, ```nslookup``` and so on. In addion, it would be
 nice to have ```bash``` and ```vim```.
 
 Then write a ```Dockerfile```
+
 
 ```
 
@@ -66,9 +68,50 @@ curl 8.11.1 (x86_64-alpine-linux-musl) libcurl/8.11.1 OpenSSL/3.3.2 zlib/1.3.1 b
 ....
 ```
 
+<!-- ------------------------------  -->
+## Prepare ```.github/workflows/docker-publish.yml```
+Prompt engineering (= the following code is written by my ChatGTP)
+
+```
+name: Build and Publish Docker Image
+
+on:
+  push:
+    branches:
+      - main  # Execute when code is pushed to main branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Check out codes in repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # 2. Log in GitHub Container Registry
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GITHUB_ACTOR }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 3. Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/my-image:latest .
+
+      # 4. Push Docker image to GitHub Container Registry
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/${{ github.repository }}/my-image:latest
+```
 
 
-<!-- ####################  -->
+
+
+<!-- ------------------------------  -->
 
 # END
 

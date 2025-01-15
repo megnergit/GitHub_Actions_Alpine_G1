@@ -1,0 +1,33 @@
+name: Build and Publish Docker Image
+
+on:
+  push:
+    branches:
+      - main  # execute GitHub Actions when a code it pushed to main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. check up codes in repository
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      # 2. Log in GitHub Container Registry
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ secrets.GITHUB_ACTOR }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 3. Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t ghcr.io/${{ github.repository }}/my-image:latest .
+
+      # 4. Push Docker iamge to GitHub Container Registry
+      - name: Push Docker image
+        run: |
+          docker push ghcr.io/${{ github.repository }}/my-image:latest
