@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IAMGE_NAME: ${{ github.repository }}
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build:
@@ -30,23 +30,23 @@ jobs:
       - name: Extract metadata for Docker
         id: meta
         uses: docker/metadata-action@v5
-	with:
-	  images: ${{ env.REGISTRY }}/${env.IMAGE_NAME }}
+        with:
+          images: ${{ env.REGISTRY }}/${env.IMAGE_NAME }}
 
       # 4. Build Docker image
       - name: Build and push Docker image
         id: push
         uses: docker/build-push-action@v2
-	  with:
-	    context: .
-	    push: true
-	    tags: ${{ steps.meta.outputs.tags }}
-	    labels: ${{ steps.meta.outputs.labels }}
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
 
       # 5. Generate artifact attestation
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
-	with:
-	  subject-name: ${{ env.REGISTRY }}/${env.IMAGE_NAME }}
-	  subject-digest: ${{ steps.push.outputs.digest }}
-	  push-to-registry: true
+        with:
+          subject-name: ${{ env.REGISTRY }}/${env.IMAGE_NAME }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
