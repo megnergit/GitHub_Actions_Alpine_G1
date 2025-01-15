@@ -25,9 +25,9 @@ jobs:
       # 3. Build Docker image
       - name: Build Docker image
         run: |
-          docker build -t ghcr.io/$(echo "GitHub_Actions_Alpine_G1" | tr '[:upper:]' '[:lower:]' | sed 's/_/-/g')/alpine-messer:latest .
+          docker build -t ghcr.io/${{ github.actor }}/$(echo "GitHub_Actions_Alpine_G1" | tr '[:upper:]' '[:lower:]' | sed 's/_/-/g')/alpine-messer:latest .
 
       # 4. Push Docker iamge to GitHub Container Registry
       - name: Push Docker image
         run: |
-          docker push ghcr.io/$(echo "GitHub_Actions_Alpine_G1" | tr '[:upper:]' '[:lower:]' | sed 's/_/-/g')/alpine-messer:latest 
+          docker push ghcr.io/${{ github.actor }}/$(echo "GitHub_Actions_Alpine_G1" | tr '[:upper:]' '[:lower:]' | sed 's/_/-/g')/alpine-messer:latest 
