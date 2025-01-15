@@ -17,6 +17,7 @@ jobs:
       id-token: write # OIDC
       packages: write
       contents: read
+      attestations: write
 
     steps:
       # 1. check up codes in repository
