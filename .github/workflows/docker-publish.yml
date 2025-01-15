@@ -28,12 +28,14 @@ jobs:
 
       # 3. Extract metadata (tags, labels) for Docker
       - name: Extract metadata for Docker
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        id: meta
+        uses: docker/metadata-action@v2
 	with:
 	  images: ${{ env.REGISTRY }}/${env.IMAGE_NAME }}
 
       # 4. Build Docker image
       - name: Build and push Docker image
+        id: push
         uses: docker/build-push-action@v2
 	  with:
 	    context: .
