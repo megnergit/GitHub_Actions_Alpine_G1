@@ -109,6 +109,14 @@ jobs:
 ```
 
 
+<!-- ------------------------------  -->
+## Add secrets
+ 1. Open ```Settings``` from the repository
+ 2. Go ```Secretes and variables``` -> ```Actions```
+ 3. ```New repository secret```.
+    Type in ```GITHUB_ACTOR``` and ```GITHUB_TOKEN```.
+ 
+ 
 
 
 <!-- ------------------------------  -->
