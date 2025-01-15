@@ -70,7 +70,6 @@ curl 8.11.1 (x86_64-alpine-linux-musl) libcurl/8.11.1 OpenSSL/3.3.2 zlib/1.3.1 b
 
 <!-- ------------------------------  -->
 ## Prepare ```.github/workflows/docker-publish.yml```
-Prompt engineering (= the following code is written by my ChatGTP)
 
 ```
 name: Build and Publish Docker Image
@@ -78,14 +77,24 @@ name: Build and Publish Docker Image
 on:
   push:
     branches:
-      - main  # Execute when code is pushed to main branch
+      - main # execute GitHub Actions when a code it pushed to main
+
+env:
+  REGISTRY: ghcr.io
+  #  IMAGE_NAME: ${{ github.repository }}
+#  IMAGE_NAME: $(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]' | sed 's/_/-/g')
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write # OIDC
+      packages: write
+      contents: read
+      attestations: write
 
     steps:
-      # 1. Check out codes in repository
+      # 1. check up codes in repository
       - name: Checkout code
         uses: actions/checkout@v2
 
@@ -94,30 +103,75 @@ jobs:
         uses: docker/login-action@v2
         with:
           registry: ghcr.io
-          username: ${{ secrets.GITHUB_ACTOR }}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # 3. Build Docker image
-      - name: Build Docker image
+      # 3. Set image name
+      - name: Set image name
+        id: set-image-name
         run: |
-          docker build -t ghcr.io/${{ github.repository }}/my-image:latest .
+          IMAGE_NAME=$(echo "${GITHUB_REPOSITORY}" | tr '[:upper:]' '[:lower:]' | sed 's/_/-/g')
+          echo "::set-output name=image_name::$IMAGE_NAME"
 
-      # 4. Push Docker image to GitHub Container Registry
-      - name: Push Docker image
-        run: |
-          docker push ghcr.io/${{ github.repository }}/my-image:latest
+      # 4. Extract metadata (tags, labels) for Docker
+      - name: Extract metadata for Docker
+        id: meta
+        uses: docker/metadata-action@v2
+        with:
+          images: ${{ env.REGISTRY }}/${{ steps.set-image-name.outputs.image_name }}
+
+      # 5. Build Docker image
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      # 6. Generate artifact attestation
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-name: ${{ env.REGISTRY }}/${{ steps.set-image-name.outputs.image_name }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
+
 ```
-
+<!-- ------------------------------  -->
+## Make sure Workflow permission
+is like this.
+![Workflow permission](./images/token-permission.png)
 
 <!-- ------------------------------  -->
-## Add secrets
- 1. Open ```Settings``` from the repository
- 2. Go ```Secretes and variables``` -> ```Actions```
- 3. ```New repository secret```.
-    Type in ```GITHUB_ACTOR``` and ```GITHUB_TOKEN```.
- 
- 
+## Push ```docker-publish.yml```
+```
+git add .
+git commit -m "Update docker-publish.yml```
+git push origin main
+```
 
+<!-- ------------------------------  -->
+## Check log
+
+Your repository -> Actions -> click on commit
+
+<!-- ------------------------------  -->
+## Check if image is properly
+
+```
+docker pull ghcr.io/megnergit/github-actions-alpine-g1:main
+main: Pulling from megnergit/github-actions-alpine-g1
+....
+
+docker images
+REPOSITORY                                   TAG       IMAGE ID       CREATED          SIZE
+ghcr.io/megnergit/github-actions-alpine-g1   main      c1303a483492   13 minutes ago   51.2MB
+
+....
+```
+Okay, done.
 
 <!-- ------------------------------  -->
 
