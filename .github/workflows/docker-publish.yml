@@ -16,7 +16,7 @@ jobs:
     permissions:
       contents: read
       packages: write
-      id-token: write
+      id-token: write # OIDC
 
     steps:
       # 1. check up codes in repository
