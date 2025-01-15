@@ -14,9 +14,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     permissions:
-      contents: read
-      packages: write
       id-token: write # OIDC
+      packages: write
+      contents: read
 
     steps:
       # 1. check up codes in repository
@@ -41,7 +41,7 @@ jobs:
       # 4. Extract metadata (tags, labels) for Docker
       - name: Extract metadata for Docker
         id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@v2
         with:
           images: ${{ env.REGISTRY }}/${{ steps.set-image-name.outputs.image_name }}
 
