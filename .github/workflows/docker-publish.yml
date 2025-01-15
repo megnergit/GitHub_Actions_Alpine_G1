@@ -3,7 +3,7 @@ name: Build and Publish Docker Image
 on:
   push:
     branches:
-      - main  # execute GitHub Actions when a code it pushed to main
+      - main # execute GitHub Actions when a code it pushed to main
 
 env:
   REGISTRY: ghcr.io
@@ -47,6 +47,6 @@ jobs:
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v2
         with:
-          subject-name: ${{ env.REGISTRY }}/${env.IMAGE_NAME }}
+          subject-name: ${{ env.REGISTRY }}/${{env.IMAGE_NAME }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
